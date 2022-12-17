@@ -42,6 +42,7 @@ class Perk:
         self.name = _name
         self.desc = _desc
         self.__statBuffs = _statBuffs
+        self.__weaponLimitations = []
 
     def __repr__(self) -> str:
         return self.name
