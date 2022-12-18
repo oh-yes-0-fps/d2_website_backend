@@ -16,7 +16,7 @@
 #       NonImplementable
 #           Just a description
 from typing import Any, Tuple, Union
-from Weapons.Enums import StatBuffID
+from Enums import StatBuffID
 
 
 class StatBuff:

@@ -1,4 +1,4 @@
-from Weapons.Enums import PartType
+from Enums import PartType
 
 
 class GunPart:

@@ -1,1 +1,1 @@
-import Weapons.Weapons as Weapons
+import Weapons as Weapons

@@ -1,5 +1,7 @@
 from enum import Enum
 
+#Contains all enums use in main directory
+#stuff in util has its own self containe enums
 
 class PartType(Enum):
     GUN = 1

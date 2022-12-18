@@ -1,10 +1,10 @@
 from dataclasses import dataclass, field
 import json
-from Weapons.Enums import WeaponType
+from Enums import WeaponType
 
 jdata = {}
 
-@dataclass(frozen=True)
+@dataclass()
 class WepData:
     rpm:int = field(default_factory=lambda: 0)
     burstSize:int = field(default_factory=lambda: 1)
