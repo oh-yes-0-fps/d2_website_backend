@@ -29,7 +29,7 @@ class StatBuff:
         if self.scale:
             ez_read_val = ""
             if self.value < 0:
-                ez_read_val = "-" + abs(str(self.value-1)) + "%"
+                ez_read_val = "-" + str(abs(self.value-1)) + "%"
             else:
                 ez_read_val = "+" + str(self.value-1) + "%"
         else:
@@ -47,17 +47,23 @@ class Perk:
     def __repr__(self) -> str:
         return self.name
 
-    def addRefund(self, _weapon: Any) -> None:
+    def apply(self, _weapon: Any) -> None:
         pass
 
+    def remove(self, _weapon: Any) -> None:
+        pass
+
+    # def getDesc(self) -> str:
+    #     # Could have made this a repr but that would get messy
+    #     desc = f"\n# {self.name}\n"
+    #     desc += self.desc
+    #     for i in self.__statBuffs:
+    #         desc += "\n"
+    #         desc += str(i)
+    #     return desc
+
     def getDesc(self) -> str:
-        # Could have made this a repr but that would get messy
-        desc = f"\n# {self.name}\n"
-        desc += self.desc
-        for i in self.__statBuffs:
-            desc += "\n"
-            desc += str(i)
-        return desc
+        return f"Not implemented yet on {__name__}"
 
 
 class OnKill(Perk):
@@ -65,14 +71,11 @@ class OnKill(Perk):
         super().__init__(_name, _desc, _statBuffs.get(0, []))
         self._newStatBuffs = _statBuffs
 
-    def getDesc(self) -> str:
-        pass
-
 
 class Refund(Perk):
     def __init__(self, _name: str, _desc: str, _statBuffs: list[StatBuff], _refundData: dict[str, Union[str, bool]]) -> None:
         super().__init__(_name, _desc, _statBuffs)
         self.refundData = _refundData
 
-    def addRefund(self, _weapon: Any) -> None:
+    def apply(self, _weapon: Any) -> None:
         _weapon.refunds.append(self.refundData)

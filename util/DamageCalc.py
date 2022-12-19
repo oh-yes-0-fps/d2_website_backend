@@ -55,9 +55,8 @@ class BuffPackage:
     MAJOR: list = field(default_factory=list)
     BOSS: list = field(default_factory=list)
     VEHICLE: list = field(default_factory=list)
-    CRITICAL: list = field(default_factory=list)
 
-    def getBuffValue(self, _type: str, _critical:bool) -> float:
+    def getBuffValue(self, _type: str) -> float:
         v1 = listProduct(self.ALL)
         v2 = 1.0
         if _type == "MINOR":
@@ -68,8 +67,7 @@ class BuffPackage:
             v2 = listProduct(self.BOSS)
         elif _type == "VEHICLE":
             v2 = listProduct(self.VEHICLE)
-        vC = listProduct(self.CRITICAL) if _critical else 1.0
-        return v1 * v2 * vC
+        return v1 * v2
 
 
 def listProduct(list1) -> float:
@@ -102,7 +100,7 @@ def plDelta(_rpl: int, _gpl:int, _difficulty:DifficultyOptions, _overrideCap:int
 
 
 def calcDmg(_activity: Activity, _baseDmg: int, _gpl: int, _global: float = 1.0, _enemyType: EnemyType = EnemyType.BOSS,
-            _buffs: BuffPackage = BuffPackage(), _critMult: float = 1) -> float:
+            _buffs: BuffPackage = BuffPackage()) -> float:
     base_dmg = 90
 
     global_mod = 1.0  # term from bl3, basically non conditional pve buffs
@@ -110,7 +108,7 @@ def calcDmg(_activity: Activity, _baseDmg: int, _gpl: int, _global: float = 1.0,
     enemyType = _enemyType.value
     enemyType_mod = V2_TABLE[enemyType]  # enemy tier specific multiplier
 
-    buff_mod = _buffs.getBuffValue(enemyType, _critMult != 1)
+    buff_mod = _buffs.getBuffValue(enemyType)
 
     rPL = _activity.rPL
     rPL_Mult = rplToMult(rPL)
@@ -121,5 +119,5 @@ def calcDmg(_activity: Activity, _baseDmg: int, _gpl: int, _global: float = 1.0,
     difficulty = _activity.difficulty
     deltaMult = plDelta(rPL, gPL, difficulty)
 
-    return base_dmg * (global_mod * enemyType_mod * rPL_Mult * buff_mod * deltaMult * _critMult)
+    return base_dmg * (global_mod * enemyType_mod * rPL_Mult * buff_mod * deltaMult)
 
