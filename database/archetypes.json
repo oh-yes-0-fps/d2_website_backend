@@ -416,7 +416,7 @@
             "Aggressive":      {"damage":22.3, "critMult":1.1, "burstDelay":1.099908, "burstSize":12, "burstDuration":0},
             "Slug":            {"damage":151.0, "critMult":1.7, "burstDelay":0.933126, "burstSize":1, "burstDuration":0},
             "Disabled":        {"damage":0, "critMult":1.0, "burstDelay":0, "burstSize":0, "burstDuration":0},
-            "LoW"              {"damage":35.0, "critMult":1.4, "burstDelay":0, "burstSize":0, "burstDuration":0},
+            "LoW":             {"damage":35.0, "critMult":1.4, "burstDelay":0.1, "burstSize":1, "burstDuration":0.29}
         }
     },
     "Sidearm": {
@@ -456,7 +456,11 @@
         "archetypes": {
             "Rapid-Fire":       {"damage":25, "critMult":1.4, "burstDelay":0.133333, "burstSize":1, "burstDuration":0},
             "Precision":        {"damage":40, "critMult":1.4, "burstDelay":0.233463, "burstSize":1, "burstDuration":0},
-            "Aggressive_Burst": {"damage":32, "critMult":1.4, "burstDelay":1.099908, "burstSize":2, "burstDuration":0}
+            "Aggressive_Burst": {"damage":32, "critMult":1.4, "burstDelay":0.23331, "burstSize":2, "burstDuration":0.1333},
+            "Adaptive_Burst":   {"damage":20, "critMult":1.6, "burstDelay":0.20000, "burstSize":3, "burstDuration":0.1667},
+            "Adaptive":         {"damage":36, "critMult":1.4, "burstDelay":0.20000, "burstSize":1, "burstDuration":0},
+            "Lightweight":      {"damage":31, "critMult":1.4, "burstDelay":0.20000, "burstSize":1, "burstDuration":0},
+            "Forerunner":       {"damage":34, "critMult":2.0, "burstDelay":0.3, "burstSize":1, "burstDuration":0}
         }
     },
     "Sniper Rifle": {
@@ -478,6 +482,12 @@
                     "stow": {"vpp": -0.1379754,           "number": 26.00919}
                 }
             }
+        },
+        "archetypes": {
+            "Rapid-Fire": {"damage":90, "critMult":3.3, "burstDelay":0.43321, "burstSize":1, "burstDuration":0},
+            "Adaptive":   {"damage":131, "critMult":2.9, "burstDelay":0.66667, "burstSize":1, "burstDuration":0},
+            "Aggressive": {"damage":158, "critMult":3.0, "burstDelay":0.83333, "burstSize":1, "burstDuration":0},
+            "Whisper":  {"damage":170, "critMult":4.5, "burstDelay":0.83333, "burstSize":1, "burstDuration":0}
         }
     },
     "Submachine Gun": {
