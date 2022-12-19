@@ -224,6 +224,15 @@
                     "stow": {"vpp": -0.153306,           "number": 28.8991}
                 }
             }
+        },
+        "archetypes": {
+            "Precision":  {"damage":40, "critMult":1.5, "burstDelay":0.3333, "burstSize":1, "burstDuration":0},
+            "Aggressive": {"damage":50, "critMult":1.6, "burstDelay":0.5, "burstSize":1, "burstDuration":0},
+            "Adaptive":   {"damage":46.5, "critMult":1.5, "burstDelay":0.43321, "burstSize":1, "burstDuration":0},
+            "Lightweight":{"damage":42, "critMult":1.6, "burstDelay":0.4, "burstSize":1, "burstDuration":0},
+            "Rapid-Fire": {"damage":38, "critMult":1.4, "burstDelay":0.26667, "burstSize":1, "burstDuration":0},
+            "Crimson":    {"damage":19, "critMult":1.6, "burstDelay":0.14458, "burstSize":3, "burstDuration":0.2333},
+            "Eriana":     {"damage":78, "critMult":1.6, "burstDelay":0.66667, "burstSize":1, "burstDuration":0}
         }
     },
     "Linear Fusion Rifle": {
@@ -241,6 +250,12 @@
                     "stow": {"vpp": -0.153306,           "number": 28.8991}
                 }
             }
+        },
+        "archetypes": {
+            "Precision":    {"damage": 166, "critMult": 3.0, "burstDelay": 0.533, "burstSize": 1, "burstDuration": 0.02},
+            "Aggressive":   {"damage": 70,  "critMult": 3.0, "burstDelay": 0.533, "burstSize": 3, "burstDuration": 0.5, "TODO": true},
+            "QueenBreaker": {"damage": 131, "critMult": 2.5, "burstDelay": 0.300, "burstSize": 1, "burstDuration": 0},
+            "SleeperSim":   {"damage": 726, "critMult": 1.2, "burstDelay": 1.033, "burstSize": 1, "burstDuration": 0}
         }
     },
     "Machine Gun": {
@@ -259,7 +274,22 @@
                     "ready":{"vpp": -0.199386,           "number": 33.3015},
                     "stow": {"vpp": -0.153306,           "number": 28.8991}
                 }
+            },
+            "explosive": {
+                "range":    null,
+                "reload":   {"a": 0.0000905351,  "b": -0.0305819, "c": 6.12199050000000, "mag_multiplier": false},
+                "handling": {
+                    "ready":{"vpp": -0.199386,           "number": 33.3015},
+                    "stow": {"vpp": -0.153306,           "number": 28.8991}
+                }
             }
+        },
+        "archetypes": {
+            "High-Impact": {"damage": 34, "critMult": 1.4, "burstDelay": 0.16667, "burstSize": 1, "burstDuration": 0},
+            "Adaptive":    {"damage": 30, "critMult": 1.4, "burstDelay": 0.13333, "burstSize": 1, "burstDuration": 0},
+            "Rapid-Fire":  {"damage": 18, "critMult": 1.3, "burstDelay": 0.06667, "burstSize": 1, "burstDuration": 0},
+            "Xenophage":   {"damage": 150, "critMult": 1.0, "burstDelay": 0.5000, "burstSize": 1, "burstDuration": 0},
+            "HeirApparent":{"damage": 30, "critMult": 1.4, "burstDelay": 0.13333, "burstSize": 1, "burstDuration": 0}
         }
     },
     "Pulse Rifle":{
@@ -285,6 +315,15 @@
                     "stow": {"vpp": -0.153306,           "number": 28.8991}
                 }
             }
+        },
+        "archetypes": {
+            "Aggressive":    {"damage":15.5, "critMult":1.7, "burstDelay":0.13333, "burstSize":4, "burstDuration":0.2333},
+            "High-Impact":   {"damage":22, "critMult":1.6, "burstDelay":0.17647, "burstSize":3, "burstDuration":0.1667},
+            "Rapid-Fire":    {"damage":14, "critMult":1.7, "burstDelay":0.111111, "burstSize":3, "burstDuration":0.1667},
+            "Adaptive":      {"damage":19, "critMult":1.7, "burstDelay":0.15385, "burstSize":3, "burstDuration":0.1667},
+            "Lightweight":   {"damage":16, "critMult":1.6, "burstDelay":0.111111, "burstSize":3, "burstDuration":0.1667},
+            "VigilanceWing": {"damage":16, "critMult":1.5, "burstDelay":0.11321, "burstSize":5, "burstDuration":0.3},
+            "GravitonLance": {"damage":23, "critMult":1.6, "burstDelay":0.23346, "burstSize":5, "burstDuration":0.1}
         }
     },
     "Rocket Launcher": {
@@ -309,6 +348,9 @@
                     "stow": {"vpp": -0.153306,           "number": 28.8991}
                 }
             }
+        },
+        "archetypes": {
+            "High-Impact": {}
         }
     },
     "Scout Rifle": {
@@ -323,6 +365,7 @@
         "3668782036": {"name": "The Jade Rabbit",   "category": "default"},
         "3920852688": {"name": "Rapid-Fire Frame",  "category": "default"},
         "4185339856": {"name": "Symmetry",          "category": "default"},
+        "3468089894": {"name": "Aggressive Frame",  "category": "DMT"},
 
         "category": {
             "default": {
@@ -341,6 +384,15 @@
                     "stow": {"vpp": -0.153306,           "number": 28.8991}
                 }
             }
+        },
+        "archetypes": {
+            "High-Impact": {"damage":40.0, "critMult":1.8, "burstDelay":0.4, "burstSize":1, "burstDuration":0},
+            "Rapid-Fire":  {"damage":28.0, "critMult":1.7, "burstDelay":0.23346, "burstSize":1, "burstDuration":0},
+            "Lightweight": {"damage":31.0, "critMult":1.7, "burstDelay":0.3, "burstSize":1, "burstDuration":0},
+            "Precision":   {"damage":31.0, "critMult":1.7, "burstDelay":0.3333, "burstSize":1, "burstDuration":0},
+            "Aggressive":  {"damage":47.0, "critMult":1.7, "burstDelay":0.5, "burstSize":1, "burstDuration":0},
+
+
         }
     },
     "Shotgun": {
@@ -487,7 +539,7 @@
             "Rapid-Fire": {"damage":90, "critMult":3.3, "burstDelay":0.43321, "burstSize":1, "burstDuration":0},
             "Adaptive":   {"damage":131, "critMult":2.9, "burstDelay":0.66667, "burstSize":1, "burstDuration":0},
             "Aggressive": {"damage":158, "critMult":3.0, "burstDelay":0.83333, "burstSize":1, "burstDuration":0},
-            "Whisper":  {"damage":170, "critMult":4.5, "burstDelay":0.83333, "burstSize":1, "burstDuration":0}
+            "Whisper":    {"damage":170, "critMult":4.5, "burstDelay":0.83333, "burstSize":1, "burstDuration":0}
         }
     },
     "Submachine Gun": {
