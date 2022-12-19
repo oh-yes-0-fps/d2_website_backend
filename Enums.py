@@ -10,6 +10,10 @@ class PartType(Enum):
     GLAIVE = 4
     BATTERY = 5
 
+class AmmoTypes(Enum):
+    PRIMARY = 1
+    SPECIAL = 2
+    HEAVY = 3
 
 class WeaponType(Enum):
     """used to determine the type of weapon"""

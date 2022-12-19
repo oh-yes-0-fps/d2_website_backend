@@ -2,7 +2,7 @@
 
 from math import ceil
 from typing import Any, Tuple, Type, Union
-from Perks import Perk  # Weapons.
+from perks.Perks import Perk, PerkSlider, PerkToggle  # Weapons.
 from Enums import WeaponType, IntrinsicFrame
 from util.DpsCalc import calcDPS, calcRefund
 from util.TtkCalc import calcTtk
@@ -31,9 +31,14 @@ class Weapon:
     """Base class for all weapons"""
     __perks: list[Perk] = []
 
+
+    UI_Sliders = []
+    UI_Toggles = []
+
     def __init__(self, weaponData) -> None:
         self.name = "Base Weapon"
 
+        self.baseDamage = 0
         self.rangeStat = 100
         self.stabilityStat = 100
         self.handlingStat = 100
@@ -50,10 +55,13 @@ class Weapon:
         self.burstDuration = 0.0
         self.burstDelay = rpmToDelay(self.rpmStat)
         # self.chargeTime = 0.0
-        self.reloadTime = 1.0
 
         self.critMult = 1.0
 
+        self.hipFireRangeScalar = 1.0
+        self.reloadDurationScalar = 1.0
+        self.swapDurationScalar = 1.0
+        self.zoomDurationScalar = 1.0
 
         self.refunds:list[dict[str,Any]] = []
 
@@ -79,6 +87,24 @@ class Weapon:
             return
         self.__perks.append(prk)
         prk.apply(self)
+
+    def onValueChanged(self) -> None:
+        """called when a value is changed"""
+        for perk in self.__perks:
+            perk.update(self)
+
+    def addUiElement(self, _element: Union[PerkSlider, PerkToggle]) -> None:
+        if isinstance(_element, PerkSlider):
+            self.UI_Sliders.append(_element)
+        elif isinstance(_element, PerkToggle):
+            self.UI_Toggles.append(_element)
+
+    def removeUiElement(self, _element: Union[PerkSlider, PerkToggle]) -> None:
+        if isinstance(_element, PerkSlider):
+            self.UI_Sliders.remove(_element)
+        elif isinstance(_element, PerkToggle):
+            self.UI_Toggles.remove(_element)
+
 
     def getReserves(self) -> int:
         #TODO: try and figure out formula for reserves
