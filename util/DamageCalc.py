@@ -1,5 +1,4 @@
 from dataclasses import dataclass, field
-from logging import CRITICAL
 from typing import Optional, Tuple
 from DataCurve import DataCurve, CurveKey
 # from util.DataCurve import DataCurve, CurveKey
