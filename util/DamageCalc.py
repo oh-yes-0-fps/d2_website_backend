@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from logging import CRITICAL
 from typing import Optional, Tuple
-from util.DataCurve import DataCurve, CurveKey
+from DataCurve import DataCurve, CurveKey
+# from util.DataCurve import DataCurve, CurveKey
 from enum import Enum
 
 
@@ -11,11 +12,11 @@ RAID_DELTA_DATA = [(0,0.925),(-10,0.73),(-20,0.62),(-30,0.5632),(-40,0.5252),(-5
 MASTER_DELTA_DATA = [(0,0.85),(-10,0.68),(-20,0.58),(-30,0.5336),(-40,0.505),(-50,0.485),(-60,0.475)]
 WEAPONDELTAEXPONENT = 1.006736
 V2_TABLE = {  # weapon type
-    "VEHICLE": 1.12,
-    "BOSS": 1.2,
-    "MINIBOSS": 1.3,
-    "ELITE": 1.55,
-    "MINOR": 2.5
+    "VEHICLE": 4.7,
+    "BOSS": 4.7,
+    "MINIBOSS": 4.7,
+    "ELITE": 5,
+    "MINOR": 6
 }
 
 class DifficultyData:
@@ -101,9 +102,6 @@ def plDelta(_rpl: int, _gpl:int, _difficulty:DifficultyOptions, _overrideCap:int
 
 def calcDmg(_activity: Activity, _baseDmg: int, _gpl: int, _global: float = 1.0, _enemyType: EnemyType = EnemyType.BOSS,
             _buffs: BuffPackage = BuffPackage()) -> float:
-    base_dmg = 90
-
-    global_mod = 1.0  # term from bl3, basically non conditional pve buffs
 
     enemyType = _enemyType.value
     enemyType_mod = V2_TABLE[enemyType]  # enemy tier specific multiplier
@@ -119,5 +117,12 @@ def calcDmg(_activity: Activity, _baseDmg: int, _gpl: int, _global: float = 1.0,
     difficulty = _activity.difficulty
     deltaMult = plDelta(rPL, gPL, difficulty)
 
-    return base_dmg * (global_mod * enemyType_mod * rPL_Mult * buff_mod * deltaMult)
+    return _baseDmg * (_global * enemyType_mod * rPL_Mult * buff_mod * deltaMult)
+
+if __name__ == "__main__":
+    pass
+    activity = Activity(1350, DifficultyOptions.NORMAL)
+    print(
+        calcDmg(activity, 193, 1579, 1, EnemyType.MINIBOSS)
+    )
 

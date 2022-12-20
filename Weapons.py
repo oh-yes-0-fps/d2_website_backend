@@ -140,9 +140,9 @@ class Weapon:
 
     def modReloadStat(self, _reloadBuff:float, _additive:bool) -> None:
         if _additive:
-            self.reloadTime += _reloadBuff
+            self.reloadStat += _reloadBuff
             return
-        self.reloadTime *= self.modifierConversion(_reloadBuff)
+        self.reloadStat *= self.modifierConversion(_reloadBuff)
 
     def modMagSize(self, _magBuff:int, _additive:bool) -> None:
         if _additive:

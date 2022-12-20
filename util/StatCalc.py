@@ -73,3 +73,4 @@ def calcHandling(_infoDict: dict[str, float], _handlingStat:int, _handlingMult:f
     }
 
     return outDict
+ 
