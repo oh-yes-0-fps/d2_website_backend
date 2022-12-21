@@ -403,7 +403,7 @@
         "3419274965": {"name": "Precision Frame",       "category": "default", "pveMult":1.00},
         "3468089894": {"name": "Aggressive Frame",      "category": "default", "pveMult":1.00},
         "3649430342": {"name": "Two-Tailed Fox",        "category": "default", "pveMult":1.00},
-        "2962361451": {"name": "Gjallarhorn",           "category": "default", "pveMult":1.00},
+        "2962361451": {"name": "Gjallarhorn",           "category": "default", "pveMult":0.75},
 
         "category": {
             "default": {

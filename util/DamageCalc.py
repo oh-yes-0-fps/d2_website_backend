@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Optional, Tuple
 # from DataCurve import DataCurve, CurveKey
 from util.DataCurve import DataCurve, CurveKey
-from ..Enums import EnemyType
+from Enums import EnemyType
 from enum import Enum
 
 
@@ -10,14 +10,8 @@ NORMAL_DELTA_DATA = [(0,1),(-10,0.78),(-20,0.66),(-30,0.5914),(-40,0.5405),(-50,
                     (-70,0.46),(-80,0.44),(-90,0.42),(-99,0.418)]
 RAID_DELTA_DATA = [(0,0.925),(-10,0.73),(-20,0.62),(-30,0.5632),(-40,0.5252),(-50,0.495),(-60,0.475)]
 MASTER_DELTA_DATA = [(0,0.85),(-10,0.68),(-20,0.58),(-30,0.5336),(-40,0.505),(-50,0.485),(-60,0.475)]
-WEAPONDELTAEXPONENT = 1.006736
-V2_TABLE = {  # weapon type
-    "VEHICLE": 4.7,
-    "BOSS": 4.7,
-    "MINIBOSS": 4.7,
-    "ELITE": 5,
-    "MINOR": 6
-}
+WEAPON_DELTA_EXPONENT = 1.006736
+
 
 class DifficultyData:
     def __init__(self, _name: str, _curve: list[Tuple[int, float]], _cap: int):
@@ -41,6 +35,8 @@ class Activity:
         self.rPL = _reccomendedPL
         if _overrideCap is None:
             self.overrideCap = _difficulty.value.cap
+        else:
+            self.difficulty.value.cap = _overrideCap
 
 @dataclass()
 class BuffPackage:
@@ -95,13 +91,13 @@ def plDelta(_rpl: int, _gpl:int, _difficulty:DifficultyOptions, _overrideCap:int
         delta = _overrideCap
     if delta < -60:
         curve = DifficultyOptions.NORMAL.value.gearCurve
-    wepDeltaMult = WEAPONDELTAEXPONENT**delta
+    wepDeltaMult = WEAPON_DELTA_EXPONENT**delta
     gearDeltaMult = curve.eval(delta)
     return wepDeltaMult * gearDeltaMult
 
 
 
-def calcDmgPve(_activity: Activity, _baseDmg: int, _gpl: int, _enemyType:EnemyType = EnemyType.BOSS,
+def calcDmgPve(_activity: Activity, _baseDmg: float, _gpl: int, _enemyType:EnemyType = EnemyType.BOSS,
                 _buffs: BuffPackage = BuffPackage()) -> float:
 
     buff_mod = _buffs.getBuffValuePVE(_enemyType.value)
@@ -114,4 +110,3 @@ def calcDmgPve(_activity: Activity, _baseDmg: int, _gpl: int, _enemyType:EnemyTy
     deltaMult = plDelta(rPL, _gpl, difficulty)
 
     return _baseDmg * (rPL_Mult * buff_mod * deltaMult)
-
