@@ -1,7 +1,8 @@
 from dataclasses import dataclass, field
 from typing import Optional, Tuple
-from DataCurve import DataCurve, CurveKey
-# from util.DataCurve import DataCurve, CurveKey
+# from DataCurve import DataCurve, CurveKey
+from util.DataCurve import DataCurve, CurveKey
+from ..Enums import EnemyType
 from enum import Enum
 
 
@@ -33,13 +34,6 @@ class DifficultyOptions(Enum):
     RAID_DUNGEON = DifficultyData("Raid & Dungeon", RAID_DELTA_DATA, 20)
     MASTER = DifficultyData("Master", MASTER_DELTA_DATA, 20)
 
-class EnemyType(Enum):
-    MINOR = "MINOR"
-    ELITE = "ELITE"
-    MINIBOSS = "MINIBOSS"
-    BOSS = "BOSS"
-    VEHICLE = "VEHICLE"
-
 class Activity:
     def __init__(self, _reccomendedPL:int, _difficulty: DifficultyOptions = DifficultyOptions.NORMAL, _name: str = "Custom", _overrideCap: Optional[int] = None):
         self.name = _name
@@ -50,14 +44,15 @@ class Activity:
 
 @dataclass()
 class BuffPackage:
-    ALL: list = field(default_factory=list)
+    PVP: list = field(default_factory=list)
+    PVE: list = field(default_factory=list)
     MINOR: list = field(default_factory=list)
     MAJOR: list = field(default_factory=list)
     BOSS: list = field(default_factory=list)
     VEHICLE: list = field(default_factory=list)
 
-    def getBuffValue(self, _type: str) -> float:
-        v1 = listProduct(self.ALL)
+    def getBuffValuePVE(self, _type: str) -> float:
+        v1 = listProduct(self.PVE)
         v2 = 1.0
         if _type == "MINOR":
             v2 = listProduct(self.MINOR)
@@ -68,6 +63,13 @@ class BuffPackage:
         elif _type == "VEHICLE":
             v2 = listProduct(self.VEHICLE)
         return v1 * v2
+
+    def getBuffValuePVP(self) -> float:
+        return listProduct(self.PVP)
+
+    def addPVE_PVP(self, _value: float):
+        self.PVP.append(_value)
+        self.PVE.append(_value)
 
 
 def listProduct(list1) -> float:
@@ -99,29 +101,17 @@ def plDelta(_rpl: int, _gpl:int, _difficulty:DifficultyOptions, _overrideCap:int
 
 
 
-def calcDmg(_activity: Activity, _baseDmg: int, _gpl: int, _global: float = 1.0, _enemyType: EnemyType = EnemyType.BOSS,
-            _buffs: BuffPackage = BuffPackage()) -> float:
+def calcDmgPve(_activity: Activity, _baseDmg: int, _gpl: int, _enemyType:EnemyType = EnemyType.BOSS,
+                _buffs: BuffPackage = BuffPackage()) -> float:
 
-    enemyType = _enemyType.value
-    enemyType_mod = V2_TABLE[enemyType]  # enemy tier specific multiplier
-
-    buff_mod = _buffs.getBuffValue(enemyType)
+    buff_mod = _buffs.getBuffValuePVE(_enemyType.value)
 
     rPL = _activity.rPL
     rPL_Mult = rplToMult(rPL)
 
-    # wPL = 1600
     #I'm going to assume weapon and gear PL are the same, separating makes more complicated for user
-    gPL = _gpl
     difficulty = _activity.difficulty
-    deltaMult = plDelta(rPL, gPL, difficulty)
+    deltaMult = plDelta(rPL, _gpl, difficulty)
 
-    return _baseDmg * (_global * enemyType_mod * rPL_Mult * buff_mod * deltaMult)
-
-if __name__ == "__main__":
-    pass
-    activity = Activity(1350, DifficultyOptions.NORMAL)
-    print(
-        calcDmg(activity, 193, 1579, 1, EnemyType.MINIBOSS)
-    )
+    return _baseDmg * (rPL_Mult * buff_mod * deltaMult)
 

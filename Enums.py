@@ -94,3 +94,10 @@ class StatBuffID(Enum):
     GRENADE_CD = "Grenade CoolDown"
     SUPER_CD = "Super CoolDown"
     CLASS_ABIL_CD = "Class Ability CoolDown"
+
+class EnemyType(Enum):
+    MINOR = "MINOR"
+    ELITE = "ELITE"
+    MINIBOSS = "MINIBOSS"
+    BOSS = "BOSS"
+    VEHICLE = "VEHICLE"
