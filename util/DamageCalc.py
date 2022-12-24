@@ -34,16 +34,17 @@ class Activity:
         self.difficulty = _difficulty
         self.rPL = _reccomendedPL
         if _overrideCap is None:
-            self.overrideCap = _difficulty.value.cap
+            self.overrideCap:int = _difficulty.value.cap
         else:
-            self.difficulty.value.cap = _overrideCap
+            self.overrideCap:int = _overrideCap
 
 @dataclass()
 class BuffPackage:
     PVP: list = field(default_factory=list)
     PVE: list = field(default_factory=list)
     MINOR: list = field(default_factory=list)
-    MAJOR: list = field(default_factory=list)
+    ELITE: list = field(default_factory=list)
+    MINIBOSS: list = field(default_factory=list)
     BOSS: list = field(default_factory=list)
     VEHICLE: list = field(default_factory=list)
 
@@ -52,8 +53,10 @@ class BuffPackage:
         v2 = 1.0
         if _type == "MINOR":
             v2 = listProduct(self.MINOR)
-        elif _type == "ELITE" or _type == "MINIBOSS":
-            v2 = listProduct(self.MAJOR)
+        elif _type == "ELITE":
+            v2 = listProduct(self.ELITE)
+        elif _type == "MINIBOSS":
+            v2 = listProduct(self.MINIBOSS)
         elif _type == "BOSS":
             v2 = listProduct(self.BOSS)
         elif _type == "VEHICLE":
@@ -80,13 +83,12 @@ def rplToMult(rpl: int) -> float:
 
 
 def plDelta(_rpl: int, _gpl:int, _difficulty:DifficultyOptions, _overrideCap:int = 100 ) -> float:
+    """Assumes weapon and gear PL are the same"""
     difficultyData:DifficultyData = _difficulty.value
     curve = difficultyData.gearCurve
     delta = _gpl - _rpl
     if delta <= -100:
         return 0 #enemies are immune below -99
-    if delta >= difficultyData.cap:
-        delta = difficultyData.cap
     if delta >= _overrideCap:
         delta = _overrideCap
     if delta < -60:
@@ -97,9 +99,9 @@ def plDelta(_rpl: int, _gpl:int, _difficulty:DifficultyOptions, _overrideCap:int
 
 
 
-def calcDmgPve(_activity: Activity, _baseDmg: float, _gpl: int, _enemyType:EnemyType = EnemyType.BOSS,
+def calcDmgPve(_activity: Activity, _baseDmg: float, _gpl: int, _worldBonuses:float = 1.0, _enemyType:EnemyType = EnemyType.BOSS,
                 _buffs: BuffPackage = BuffPackage()) -> float:
-
+    """Does not account for crit damage and crit buffs, world bonuses are like kinetic buff, burns, heavyweaight etc"""
     buff_mod = _buffs.getBuffValuePVE(_enemyType.value)
 
     rPL = _activity.rPL
@@ -107,6 +109,11 @@ def calcDmgPve(_activity: Activity, _baseDmg: float, _gpl: int, _enemyType:Enemy
 
     #I'm going to assume weapon and gear PL are the same, separating makes more complicated for user
     difficulty = _activity.difficulty
-    deltaMult = plDelta(rPL, _gpl, difficulty)
+    deltaMult = plDelta(rPL, _gpl, difficulty, _activity.overrideCap)
 
-    return _baseDmg * (rPL_Mult * buff_mod * deltaMult)
+    return _baseDmg * (rPL_Mult * buff_mod * deltaMult * _worldBonuses)
+
+def calcDmgPvp(_baseDmg :float, _buffs: BuffPackage = BuffPackage()) -> float:
+    """Does not account for crit damage or crit buffs"""
+    buff_mod = _buffs.getBuffValuePVP()
+    return _baseDmg * buff_mod
