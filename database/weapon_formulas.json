@@ -652,14 +652,14 @@
         }
     },
     "Sniper Rifle": {
-        "281315705":  {"name": "Whisper of the Worm", "category": "default", "archetype": "Whisper"},
-        "878286503":  {"name": "Rapid-Fire Frame",    "category": "default", "archetype": "Rapid-Fire"},
-        "938999636":  {"name": "D.A.R.C.I.",          "category": "default", "archetype": "Rapid-Fire"},
-        "1070100196": {"name": "Izanagi's Burden",    "category": "default", "archetype": "Adaptive"},
-        "1294026524": {"name": "Adaptive Frame",      "category": "default", "archetype": "Adaptive"},
-        "2909403175": {"name": "Cloudstrike",         "category": "default", "archetype": "Rapid-Fire"},
-        "3081173348": {"name": "Borealis",            "category": "default", "archetype": "Aggressive"},
-        "3468089894": {"name": "Aggressive Frame",    "category": "default", "archetype": "Aggressive"},
+        "281315705":  {"name": "Whisper of the Worm", "category": "default", "archetype": "Whisper",    "pveMult": 1.0},
+        "878286503":  {"name": "Rapid-Fire Frame",    "category": "default", "archetype": "Rapid-Fire", "pveMult": 1.0},
+        "938999636":  {"name": "D.A.R.C.I.",          "category": "default", "archetype": "Rapid-Fire", "pveMult": 1.0},
+        "1070100196": {"name": "Izanagi's Burden",    "category": "default", "archetype": "Adaptive",   "pveMult": 1.0},
+        "1294026524": {"name": "Adaptive Frame",      "category": "default", "archetype": "Adaptive",   "pveMult": 1.0},
+        "2909403175": {"name": "Cloudstrike",         "category": "default", "archetype": "Rapid-Fire", "pveMult": 1.0},
+        "3081173348": {"name": "Borealis",            "category": "default", "archetype": "Aggressive", "pveMult": 1.0},
+        "3468089894": {"name": "Aggressive Frame",    "category": "default", "archetype": "Aggressive", "pveMult": 1.0},
 
         "category": {
             "default": {

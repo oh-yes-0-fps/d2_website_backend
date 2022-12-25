@@ -5,7 +5,7 @@ from Enums import AmmoType, StatHashes, sockets
 from util.DamageCalc import BuffPackage
 from typing import Optional, Tuple
 from Enums import WeaponType, WeaponSlot, DamageType
-
+from loadedDatabases import *
 
 @dataclass()
 class FiringConfig:
@@ -77,13 +77,15 @@ class APIWeaponData:
                 burstDelay=archetypeData["burstDelay"],
                 burstDuration=archetypeData["burstDuration"],
                 burstSize=archetypeData["burstSize"],
-                oneAmmoBurst=archetypeData["oneAmmoBurst"],
+                oneAmmoBurst=archetypeData.get("oneAmmoBurst", False),
                 isCharge=False,  # TODO
             )
         )
 
 
 API_ROOT = "https://www.bungie.net/Platform/Destiny2/"
+CONTENT_ROOT = "https://www.bungie.net"
+WANTED_ENTITIES = []
 API_KEY = "89c9db2c0a8b46449bb5e654b6e594d0"  # no yoinky😡
 API_KEY_HEADER = {"X-API-Key": API_KEY}
 
@@ -95,16 +97,22 @@ def getManifest():
 
 
 def getEntityDefinition(_entityType: str, _entityHash: int):
+    """Only use for niche things that arent in db"""
     entityDef = requests.get(
         API_ROOT + f"Manifest/{_entityType}/{_entityHash}/", headers=API_KEY_HEADER).json()
     return entityDef
 
+def getWeaponDefinition(_weaponHash: int):
+    return WEAPONS[str(_weaponHash)]
+
+def getStatLayout(_statLayoutHash: int):
+    return STAT_LAYOUTS[str(_statLayoutHash)]
+
+def getPlugSet(_plugSetHash: int):
+    return PLUGSETS[str(_plugSetHash)]
 
 def isWeapon(_entityHash: int) -> bool:
-    entityDef = getEntityDefinition(
-        "DestinyInventoryItemDefinition", _entityHash)
-    bucketHash = entityDef["Response"]["inventory"]["bucketTypeHash"]
-    if bucketHash == 2465295065 or bucketHash == 1498876634 or bucketHash == 953998645:
+    if str(_entityHash) in WEAPONS:
         return True
     else:
         return False
@@ -146,36 +154,38 @@ def getItemFromSearchJson(_searchResults: dict, _item: str) -> int:
     return 0
 
 def entityDefJsonToWeaponData(_entityDef: dict) -> APIWeaponData:
-    response:dict = _entityDef["Response"]
-    name = response["displayProperties"]["name"]  # done
-    weaponTypeHash = response["itemSubType"]  # done
+    wepDef:dict = _entityDef#["Response"]
+    name = wepDef["displayProperties"]["name"]  # done
+    weaponTypeHash = wepDef["itemSubType"]  # done
 
     # done
-    intrinsicHash = response["sockets"]["socketEntries"][0]["singleInitialItemHash"]
+    intrinsicHash = wepDef["sockets"]["socketEntries"][0]["singleInitialItemHash"]
 
     stats = {}  # done
-    for stat in response["stats"]["stats"].keys():
+    for stat in wepDef["stats"]["stats"].keys():
         stat = int(stat)
         enum = StatHashes.hashToEnum(stat)
         if StatHashes.isWeaponStat(enum):
-            stats[enum] = response["stats"]["stats"][str(stat)]["value"]
+            stats[enum] = wepDef["stats"]["stats"][str(stat)]["value"]
+    for stat in wepDef["investmentStats"]:
+        if stat["statTypeHash"] == StatHashes.MAGAZINE.value:
+            stats[StatHashes.MAGAZINE] = stat["value"]
 
-    statLayout = getEntityDefinition("DestinyStatGroupDefinition",  # done
-                                    response["stats"]["statGroupHash"])["Response"]["scaledStats"]
+    statLayout = getStatLayout(wepDef["stats"]["statGroupHash"])["scaledStats"]
 
     perks = {}  # done?
-    for category in response["sockets"]["socketCategories"]:
+    for category in wepDef["sockets"]["socketCategories"]:
         if sockets.isWeaponSocket(category["socketCategoryHash"]):
-            entries = response["sockets"]["socketEntries"]
+            entries = wepDef["sockets"]["socketEntries"]
             for i in category["socketIndexes"]:
                 perkHashes = []
                 perkHashes.append((entries[i]["singleInitialItemHash"], True))
                 if entries[i]["plugSources"] == 2:
-                    perkHashes.append(getEntityDefinition("DestinyPlugSetDefinition",
-                                                        entries[i]["randomizedPlugSetHash"])["Response"]["reusablePlugItems"])
+                    randHash = entries[i].get("randomizedPlugSetHash", 0)
+                    if randHash:
+                        perkHashes.append(getPlugSet(randHash)["reusablePlugItems"])
                 elif entries[i]["plugSources"] == 6:
-                    perkGroup = getEntityDefinition("DestinyPlugSetDefinition", entries[i]["reusablePlugSetHash"])[
-                        "Response"]["reusablePlugItems"]
+                    perkGroup = getPlugSet(entries[i]["reusablePlugSetHash"])["reusablePlugItems"]
                     perkGroup = [(x["plugItemHash"], x["currentlyCanRoll"])
                                     for x in perkGroup]
                     perkHashes.extend(perkGroup)
@@ -184,17 +194,78 @@ def entityDefJsonToWeaponData(_entityDef: dict) -> APIWeaponData:
             break
 
     image = {  # done
-        "icon": response["displayProperties"]["icon"],
-        "seasonalWatermark": response.get("iconWatermark",""),
-        "screenshot": response["screenshot"],
-        "secondaryIcon": response.get("secondaryIcon", "")
+        "icon": wepDef["displayProperties"]["icon"],
+        "seasonalWatermark": wepDef.get("iconWatermark",""),
+        "screenshot": wepDef["screenshot"],
+        "secondaryIcon": wepDef.get("secondaryIcon", "")
     }
 
-    slot = WeaponSlot.getEnumFromHash(response["inventory"]["bucketTypeHash"])
-    ammo = AmmoType.getEnumFromHash(response["equippingBlock"]["ammoType"])
-    damageType = DamageType.getEnumFromHash(response["defaultDamageType"])
+    slot = WeaponSlot.getEnumFromHash(wepDef["inventory"]["bucketTypeHash"])
+    ammo = AmmoType.getEnumFromHash(wepDef["equippingBlock"]["ammoType"])
+    damageType = DamageType.getEnumFromHash(wepDef["defaultDamageType"])
     return APIWeaponData(name, weaponTypeHash, intrinsicHash, stats, statLayout, perks, image, slot, damageType, ammo)
 
 
 def dictToString(_dataItem: dict) -> str:
     return json.JSONEncoder(indent=4).encode(_dataItem)
+
+#write the entire manifest database to a file
+def updateDatabase():
+    manifest = getManifest()
+    contentPaths = manifest["Response"]["jsonWorldComponentContentPaths"]["en"]
+    itemData:dict[int, dict] = requests.get("https://www.bungie.net" + contentPaths["DestinyInventoryItemDefinition"], headers=API_KEY_HEADER).json()
+
+    weaponDct = {}
+    perkDct = {}
+    armorDct = {}
+    otherDct = {}
+    indexDct = {}
+
+    MOD_ENUM = 19
+    WEAPON_ENUM = 3
+    ARMOR_ENUM = 2
+    # PATTERN_ENUM = 30
+
+    for key, value in itemData.items():
+        key = int(key)
+        if value.get("action", {}) != {}:
+            del value["action"]
+        if value.get("itemType", 0) == WEAPON_ENUM:
+            indexDct[key] = "weapon"
+            weaponDct[key] = value
+        elif value.get("itemType", 0) == MOD_ENUM:
+            indexDct[key] = "perk"
+            perkDct[key] = value
+        elif value.get("itemType", 0) == ARMOR_ENUM:
+            if value["inventory"]["tierTypeName"] == "Exotic":# or value["inventory"]["tierTypeName"] == "Legendary"
+                    indexDct[key] = "armor"
+                    del value["stats"]
+                    armorDct[key] = value
+        else:
+            indexDct[key] = "other"
+            otherDct[key] = value
+
+    with open(".\\database\\items\\index.json", "w") as f:
+        json.dump(indexDct, f, indent=4)
+    with open(".\\database\\items\\weapon.json", "w") as f:
+        json.dump(weaponDct, f, indent=4)
+    with open(".\\database\\items\\perk.json", "w") as f:
+        json.dump(perkDct, f, indent=4)
+    with open(".\\database\\items\\other.json", "w") as f:
+        json.dump(otherDct, f, indent=4)
+    with open(".\\database\\items\\armor.json", "w") as f:
+        json.dump(armorDct, f, indent=4)
+
+
+    statLayouts = requests.get("https://www.bungie.net" + contentPaths["DestinyStatGroupDefinition"], headers=API_KEY_HEADER).json()
+    with open(".\\database\\statLayouts.json", "w") as f:
+        json.dump(statLayouts, f, indent=4)
+
+    plugSets = requests.get("https://www.bungie.net" + contentPaths["DestinyPlugSetDefinition"], headers=API_KEY_HEADER).json()
+    with open(".\\database\\plugSets.json", "w") as f:
+        json.dump(plugSets, f, indent=4)
+
+if __name__ == "__main__":
+    updateDatabase()
+
+

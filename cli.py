@@ -1,6 +1,9 @@
 from enum import Enum
+from typing import Optional
+
 import ApiInterface as api
 from Weapons import Weapon
+from Enums import EnemyType
 
 
 class viewModes(Enum):
@@ -15,8 +18,11 @@ class viewModes(Enum):
 def clearScreen():
     print("\033c", end="")
 
+weapon:Optional[Weapon] = None
 
 currentMode = viewModes.search
+
+hasAskedForDps = False
 
 rawSearchResults = {}
 searchResults = []
@@ -38,16 +44,44 @@ while True:
         if ans.isnumeric():
             ans = int(ans)
             selectedName = searchResults[ans]
-            selectedWeapon = api.getItemFromSearchJson(rawSearchResults, selectedName)
-            selectedWeapon = api.getEntityDefinition(
-                "DestinyInventoryItemDefinition", selectedWeapon)
+            selectedHash = api.getItemFromSearchJson(rawSearchResults, selectedName)
+            selectedWeapon:dict = api.getWeaponDefinition(selectedHash)
             currentMode = viewModes.weaponStats
             clearScreen()
     if currentMode == viewModes.weaponStats:
         weapon = Weapon(api.entityDefJsonToWeaponData(selectedWeapon))
         print(weapon)
-        input("Would you like to close the cli?")
-        break
+        ans = input("want some dps?")
+        if ans == "dps":
+            currentMode = viewModes.weaponDPS
+            clearScreen()
+    if currentMode == viewModes.weaponDPS:
+        rpl = input("what's the reccomended light level?")
+        if not rpl.isnumeric():
+            print("that's not a number! setting to 1350")
+            rpl = 1350
+        gpl = input("what's the guardian's power level?")
+        if not gpl.isnumeric():
+            print("that's not a number! setting to 1350")
+            gpl = 1590
+        enemyType = input("what's the enemy type? (vehicle, boss, miniboss, elite, minor, enclave)")
+        if enemyType == "vehicle":
+            enemyType = EnemyType.VEHICLE
+        elif enemyType == "miniboss":
+            enemyType = EnemyType.MINIBOSS
+        elif enemyType == "elite":
+            enemyType = EnemyType.ELITE
+        elif enemyType == "minor":
+            enemyType = EnemyType.MINOR
+        elif enemyType == "enclave":
+            enemyType = EnemyType.ENCLAVE
+        else:
+            enemyType = EnemyType.BOSS
+        if weapon:
+            dmg = weapon.getDamage(int(rpl), int(gpl), enemyType)
+            print(f"damage: {dmg}")
+            print(weapon.getDps(dmg))
+            input("press enter to continue")
 
 
     clearScreen()

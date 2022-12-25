@@ -4,11 +4,12 @@ from dataclasses import dataclass, field
 from math import ceil
 from typing import Any, Optional, Tuple, Type, Union
 # from perks.Perks import Perk, PerkSlider, PerkToggle  # Weapons.
-from Enums import AmmoType, DamageType, WeaponSlot, WeaponType, StatHashes
+from Enums import AmmoType, DamageType, EnemyType, WeaponSlot, WeaponType, StatHashes
+from util.AmmoCalc import lerp
 from util.DpsCalc import calcDPS, calcRefund
 from util.TtkCalc import calcTtk
 from util.StatCalc import calcReload, calcHandling, calcRange
-from util.DamageCalc import calcDmgPve, BuffPackage
+from util.DamageCalc import calcDmgPve, BuffPackage, Activity
 from ApiInterface import APIWeaponData, FiringConfig, FrameData
 
 
@@ -62,6 +63,12 @@ class Weapon:
         l_weaponStats = self.weaponData.stats
         self.weaponFrame = self.weaponData.getFrameData()
 
+        self.magSizeBounds = (0, 1)
+        for i in self.weaponData.statLayout:
+            if i == StatHashes.MAGAZINE.value:
+                self.magSizeBounds = (i["displayInterpolation"][0]["weight"],i["displayInterpolation"][-1]["weight"])
+
+
         self.name = _weaponData.name
 
         self.impactStat = Stat(l_weaponStats.get(StatHashes.IMPACT, -1))
@@ -69,23 +76,34 @@ class Weapon:
         self.stabilityStat = Stat(l_weaponStats.get(StatHashes.STABILITY, -1))
         self.handlingStat = Stat(l_weaponStats.get(StatHashes.HANDLING, -1))
         self.reloadStat = Stat(l_weaponStats.get(StatHashes.RELOAD, -1))
-        self.aimAssistStat = Stat(l_weaponStats.get(StatHashes.AIMASSIST, -1))
+        self.aim_assistStat = Stat(
+            l_weaponStats.get(StatHashes.AIM_ASSIST, -1))
         self.zoomStat = Stat(l_weaponStats.get(StatHashes.ZOOM, -1))
         self.airborneStat = Stat(l_weaponStats.get(StatHashes.AIRBORNE, -1))
-        self.recoil_dirStat = Stat(l_weaponStats.get(StatHashes.RECOIL_DIR, -1))
+        self.recoil_dirStat = Stat(
+            l_weaponStats.get(StatHashes.RECOIL_DIR, -1))
         self.rpmStat = Stat(l_weaponStats.get(StatHashes.RPM, -1))
         self.magazineStat = Stat(l_weaponStats.get(StatHashes.MAGAZINE, -1))
-        self.inventory_sizeStat = Stat(l_weaponStats.get(StatHashes.INVENTORY_SIZE, -1))
+        self.inventory_sizeStat = Stat(
+            l_weaponStats.get(StatHashes.INVENTORY_SIZE, -1))
         self.velocityStat = Stat(l_weaponStats.get(StatHashes.VELOCITY, -1))
-        self.blast_radiusStat = Stat(l_weaponStats.get(StatHashes.BLAST_RADIUS, -1))
+        self.blast_radiusStat = Stat(
+            l_weaponStats.get(StatHashes.BLAST_RADIUS, -1))
         self.draw_timeStat = Stat(l_weaponStats.get(StatHashes.DRAW_TIME, -1))
-        self.swing_speedStat = Stat(l_weaponStats.get(StatHashes.SWING_SPEED, -1))
-        self.charge_timeStat = Stat(l_weaponStats.get(StatHashes.CHARGE_TIME, -1))
-        self.guard_efficiencyStat = Stat(l_weaponStats.get(StatHashes.GUARD_EFFICIENCY, -1))
-        self.guard_enduranceStat = Stat(l_weaponStats.get(StatHashes.GUARD_ENDURANCE, -1))
-        self.guard_resistanceStat = Stat(l_weaponStats.get(StatHashes.GUARD_RESISTANCE, -1))
-        self.charge_rateStat = Stat(l_weaponStats.get(StatHashes.CHARGE_RATE, -1))
-        self.shield_durationStat = Stat(l_weaponStats.get(StatHashes.SHIELD_DURATION, -1))
+        self.swing_speedStat = Stat(
+            l_weaponStats.get(StatHashes.SWING_SPEED, -1))
+        self.charge_timeStat = Stat(
+            l_weaponStats.get(StatHashes.CHARGE_TIME, -1))
+        self.guard_efficiencyStat = Stat(
+            l_weaponStats.get(StatHashes.GUARD_EFFICIENCY, -1))
+        self.guard_enduranceStat = Stat(
+            l_weaponStats.get(StatHashes.GUARD_ENDURANCE, -1))
+        self.guard_resistanceStat = Stat(
+            l_weaponStats.get(StatHashes.GUARD_RESISTANCE, -1))
+        self.charge_rateStat = Stat(
+            l_weaponStats.get(StatHashes.CHARGE_RATE, -1))
+        self.shield_durationStat = Stat(
+            l_weaponStats.get(StatHashes.SHIELD_DURATION, -1))
 
         self.baseDamage = self.weaponFrame.baseDamage
         self.critMult = self.weaponFrame.critMult
@@ -109,14 +127,14 @@ class Weapon:
         self.damageType: DamageType = self.weaponData.damageType
         self.weaponSlot: WeaponSlot = self.weaponData.slot
 
-    def getStatAttrFromHash(self, _statHash: int) -> Stat:
+    def getStatAttrFromHash(self, _statHash: StatHashes) -> Stat:
         """returns the stat attribute from the hash"""
         """This is the most scuffed thing ever, i dont wanna use another dict💀"""
-        attrName = StatHashes.hashToEnum(_statHash).name.lower() + "Stat"
+        attrName = _statHash.name.lower() + "Stat"
         if attrName in self.__dir__():
             return self.__getattribute__(attrName)
         else:
-            raise ValueError("Invalid stat hash")
+            raise ValueError(f"Invalid stat hash: {_statHash}")
 
     def makeAsciiStatBar(self, _statData: Stat):
         """makes a stat bar for ascii"""
@@ -175,17 +193,26 @@ class Weapon:
     #         self.UI_Sliders.remove(_element)
     #     elif isinstance(_element, PerkToggle):
     #         self.UI_Toggles.remove(_element)
-
-    def getReserves(self) -> int:
+    @property
+    def totalReserves(self) -> int:
         # TODO: try and figure out formula for reserves
         if self.ammoType == AmmoType.PRIMARY:
             return 9999
         return 20
 
-    def getReloadTime(self) -> float:
-        if self.weaponFrame.reloadData:
+    @property
+    def magSize(self) -> int:
+        return int(lerp(self.magSizeBounds[0], self.magSizeBounds[1], self.magazineStat.val()/100)) + 1
+
+    @property
+    def reloadTime(self) -> float:
+        if self.weaponFrame.reloadData and self.reloadStat:
             return calcReload(self.weaponFrame.reloadData, self.reloadStat.val(), self.reloadStat.associatedScalar)
         return 0.0
+
+    def getDamage(self, _rpl:int, _gpl:int, _enemyType:EnemyType) -> float:
+        #TODO
+        return calcDmgPve(Activity(_rpl), self.baseDamage, _gpl, _enemyType = _enemyType, _buffs = self.damageScalars)
 
     def getDps(self, _damage: float, _shotsMissed: int = 0, _isChargeTime: bool = False) -> list[float]:
         """calculates the dps of the weapon"""
@@ -193,8 +220,8 @@ class Weapon:
             return []
         if self.weaponType == WeaponType.GRENADELAUNCHER:
             return []
-        return calcDPS(self.firingSettings.burstDelay, _damage, self.critMult, self.getReloadTime(), self.magazineStat.val(), self.getReserves(),
-                    _isChargeTime, _shotsMissed, self.refunds)
+        return calcDPS(self.firingSettings.burstDelay, _damage, self.critMult, self.reloadTime, self.magazineStat.val(), self.totalReserves,
+                       _isChargeTime, _shotsMissed, self.refunds)
 
     def graphDPS(self, _damage: float):
         pass

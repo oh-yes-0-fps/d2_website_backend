@@ -86,7 +86,7 @@ class DamageType(Enum):
 
 class StatHashes(Enum):
     ACCURACY = 1591432999
-    AIMASSIST = 1345609583
+    AIM_ASSIST = 1345609583
     AIRBORNE = 2714457168
     AMMO_CAPACITY = 925767036
     ANY_ENERGY_TYPE_COST = 3578062600
@@ -154,7 +154,7 @@ class StatHashes(Enum):
     def isWeaponStat(_enum):
         weaponStats = [
             StatHashes.ACCURACY,
-            StatHashes.AIMASSIST,
+            StatHashes.AIM_ASSIST,
             StatHashes.AIRBORNE,
             StatHashes.AMMO_CAPACITY,
             StatHashes.ZOOM,

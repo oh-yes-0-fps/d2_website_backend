@@ -2,9 +2,9 @@
 
 def calcReload(_infoDict: dict[str, float], _reloadStat:int, _durationScaler:float) -> float:
     """calculates reload stats"""
-    a = _infoDict["A"]
-    b = _infoDict["B"]
-    c = _infoDict["C"]
+    a = _infoDict["a"]
+    b = _infoDict["b"]
+    c = _infoDict["c"]
 
     return (a*(_reloadStat**2) + b*_reloadStat + c) * _durationScaler
 
