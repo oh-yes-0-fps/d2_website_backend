@@ -351,13 +351,13 @@
         }
     },
     "Machine Gun": {
-        "878286503":  {"name": "Rapid-Fire Frame",  "category": "default",  "archetype": "Rapid-Fire", "pveMult":1.00},
-        "1019291327": {"name": "High-Impact Frame", "category": "default",  "archetype": "High-Impact", "pveMult":1.00},
-        "1294026524": {"name": "Adaptive Frame",    "category": "default",  "archetype": "Adaptive", "pveMult":1.00},
-        "2261491232": {"name": "Xenophage",         "category": "default",  "archetype": "Xenophage", "pveMult":4.50},
-        "2608508147": {"name": "Heir Apparent",     "category": "default",  "archetype": "HeirApparent", "pveMult":1.00},
-        "4148158229": {"name": "Thunderlord",       "category": "default",  "archetype": "Adaptive", "pveMult":1.00},
-        "2940035732": {"name": "Grand Overture",    "category": "default",  "archetype": "", "pveMult":1.00},
+        "878286503":  {"name": "Rapid-Fire Frame",  "category": "default", "archetype": "Rapid-Fire", "pveMult":1.00},
+        "1019291327": {"name": "High-Impact Frame", "category": "default", "archetype": "High-Impact", "pveMult":1.00},
+        "1294026524": {"name": "Adaptive Frame",    "category": "default", "archetype": "Adaptive", "pveMult":1.00},
+        "2261491232": {"name": "Xenophage",         "category": "default", "archetype": "Xenophage", "pveMult":4.50},
+        "2608508147": {"name": "Heir Apparent",     "category": "default", "archetype": "HeirApparent", "pveMult":1.00},
+        "4148158229": {"name": "Thunderlord",       "category": "default", "archetype": "Adaptive", "pveMult":1.00},
+        "2940035732": {"name": "Grand Overture",    "category": "default", "archetype": "", "pveMult":1.00},
 
         "category": {
             "default": {
@@ -398,18 +398,18 @@
         }
     },
     "Pulse Rifle":{
-        "878286503":  {"name": "Rapid-Fire Frame",       "category": "default",   "pveMult":1.00},
-        "1019291327": {"name": "High-Impact Frame",      "category": "default",   "pveMult":1.00},
-        "1294026524": {"name": "Adaptive Frame",         "category": "default",   "pveMult":1.00},
-        "1458010786": {"name": "Lightweight Frame",      "category": "default",   "pveMult":1.00},
-        "2307143135": {"name": "Vigilance Wing",         "category": "default",   "pveMult":1.26},
-        "2874284214": {"name": "Aggressive Burst",       "category": "aggresive", "pveMult":1.00},
-        "3837077246": {"name": "No Time to Explain",     "category": "aggresive", "pveMult":1.00},
-        "3905543891": {"name": "Graviton Lance",         "category": "default",   "pveMult":1.00},
-        "4004944400": {"name": "Bad Juju",               "category": "default",   "pveMult":1.00},
-        "4208418110": {"name": "Outbreak Perfected",     "category": "default",   "pveMult":1.00},
-        "4172222323": {"name": "Legacy PR-55 Frame",     "category": "default",   "pveMult":1.00},
-        "3441203855": {"name": "Collective Obligation",  "category": "default",   "pveMult":1.00},
+        "878286503":  {"name": "Rapid-Fire Frame",       "category": "default",   "archetype": "Rapid-Fire",    "pveMult":1.00},
+        "1019291327": {"name": "High-Impact Frame",      "category": "default",   "archetype": "High-Impact",   "pveMult":1.00},
+        "1294026524": {"name": "Adaptive Frame",         "category": "default",   "archetype": "Adaptive",      "pveMult":1.00},
+        "1458010786": {"name": "Lightweight Frame",      "category": "default",   "archetype": "Lightweight",   "pveMult":1.00},
+        "2307143135": {"name": "Vigilance Wing",         "category": "default",   "archetype": "VigilanceWing", "pveMult":1.26},
+        "2874284214": {"name": "Aggressive Burst",       "category": "aggresive", "archetype": "Aggressive",    "pveMult":1.00},
+        "3837077246": {"name": "No Time to Explain",     "category": "aggresive", "archetype": "Aggressive",    "pveMult":1.00},
+        "3905543891": {"name": "Graviton Lance",         "category": "default",   "archetype": "GravitonLance", "pveMult":1.00},
+        "4004944400": {"name": "Bad Juju",               "category": "default",   "archetype": "Lightweight",   "pveMult":1.00},
+        "4208418110": {"name": "Outbreak Perfected",     "category": "default",   "archetype": "Lightweight",   "pveMult":1.00},
+        "4172222323": {"name": "Legacy PR-55 Frame",     "category": "default",   "archetype": "Lightweight",   "pveMult":1.00},
+        "3441203855": {"name": "Collective Obligation",  "category": "default",   "archetype": "Adaptive",      "pveMult":1.00},
 
         "category": {
             "default": {
@@ -681,17 +681,17 @@
         }
     },
     "Submachine Gun": {
-        "630329983":  {"name": "The Huckleberry",   "category": "default", "archetype": ""},
-        "1294026524": {"name": "Adaptive Frame",    "category": "default", "archetype": ""},
-        "1458010786": {"name": "Lightweight Frame", "category": "default", "archetype": ""},
-        "1525239159": {"name": "Aggressive Frame",  "category": "default", "archetype": ""},
-        "1636108362": {"name": "Precision Frame",   "category": "default", "archetype": ""},
-        "2213377102": {"name": "MIDA Synergy",      "category": "default", "archetype": ""},
-        "2516532331": {"name": "Riskrunner",        "category": "default", "archetype": ""},
-        "2540536653": {"name": "Tarrabah",          "category": "default", "archetype": ""},
-        "3468089894": {"name": "Aggressive Frame",  "category": "default", "archetype": ""},
-        "2965975126": {"name": "Osteo Striga",      "category": "striga" , "archetype": ""},
-        "228577175":  {"name": "The Manticore",     "category": "default", "archetype": ""},
+        "630329983":  {"name": "The Huckleberry",   "category": "default", "archetype": "Aggressive", "pveMult": 1.0},
+        "1294026524": {"name": "Adaptive Frame",    "category": "default", "archetype": "Adaptive",   "pveMult": 1.0},
+        "1458010786": {"name": "Lightweight Frame", "category": "default", "archetype": "Lightweight","pveMult": 1.0},
+        "1525239159": {"name": "Aggressive Frame",  "category": "default", "archetype": "Aggressive", "pveMult": 1.0},
+        "1636108362": {"name": "Precision Frame",   "category": "default", "archetype": "Precision",  "pveMult": 1.0},
+        "2213377102": {"name": "MIDA Synergy",      "category": "default", "archetype": "Lightweight","pveMult": 1.0},
+        "2516532331": {"name": "Riskrunner",        "category": "default", "archetype": "Adaptive",   "pveMult": 1.0},
+        "2540536653": {"name": "Tarrabah",          "category": "default", "archetype": "Aggressive", "pveMult": 1.0},
+        "3468089894": {"name": "Aggressive Frame",  "category": "default", "archetype": "Aggressive", "pveMult": 1.0},
+        "2965975126": {"name": "Osteo Striga",      "category": "striga" , "archetype": "Osteo",      "pveMult": 1.0},
+        "228577175":  {"name": "The Manticore",     "category": "default", "archetype": "Lightweight","pveMult": 1.0},
 
         "category": {
             "default": {

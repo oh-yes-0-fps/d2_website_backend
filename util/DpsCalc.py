@@ -5,14 +5,14 @@
 from math import ceil
 from typing import Any
 
+from ApiInterface import FiringConfig
+
 
 
 def __timeToEmpty(_mag:int,_delay:float,_burstDuration:float) -> float:
     return (_mag*_burstDuration) + ((_mag-1)*_delay)
 
 def calcRefund(_magSize:int, _critsMissed:int, _refunds:list[dict[str,Any]]) -> int:
-    """This is by far the slowest thing here with requiring a while loop,
-    I could just have static formula for existing perks but thats cringe"""
     if len(_refunds) == 0:
         return _magSize
     currMag = _magSize
@@ -30,14 +30,20 @@ def calcRefund(_magSize:int, _critsMissed:int, _refunds:list[dict[str,Any]]) -> 
         currMag -= 1
     return shotsFired# aka mag size
 
-def calcDPS(_fireDelay:float,_dmg:float,_critMult:float,_reload:float,_magSize:int,_reserves:int,
-            _isChargeTime:bool, _critsMissed:int = 0, _refunds:list[dict] = []) -> list[float]:
+def calcDPS(_firingSettings:FiringConfig,_dmg:float,_critMult:float,_reload:float,_magSize:int,_reserves:int,
+            _critsMissed:int = 0, _refunds:list[dict] = []) -> list[float]:
     numOfMags = ceil(_reserves/_magSize)
     sizeOfLastMag = round((_reserves/_magSize-(numOfMags-1))*_magSize)
-
-    if _isChargeTime:
-        _reload += _fireDelay
+    if _firingSettings.burstDuration == 0.0:
+        #simplifies multi-pellet weapons to be profiled as single pellet
+        dmg = _dmg*_firingSettings.burstSize
+    else:
+        dmg = _dmg
+    if _firingSettings.isCharge:
         #This just accounts for having to charge up again after a reload
+        reloadTime = _reload + _firingSettings.burstDelay
+    else:
+        reloadTime = _reload
     timeTaken = 0.0
     damageDealt = 0.0
     dpsPerMag = []
@@ -49,10 +55,10 @@ def calcDPS(_fireDelay:float,_dmg:float,_critMult:float,_reload:float,_magSize:i
             f_magSize = calcRefund(_magSize,_critsMissed,_refunds)
 
         if magIDX > 1:
-            timeTaken += _reload
+            timeTaken += reloadTime
 
-        timeTaken += __timeToEmpty(f_magSize,_fireDelay,0)
-        damageDealt += f_magSize*(_dmg*(_critMult*((f_magSize-_critsMissed)/f_magSize)))
+        timeTaken += __timeToEmpty(f_magSize,_firingSettings.burstDelay,_firingSettings.burstDuration)
+        damageDealt += f_magSize*(dmg*(_critMult*((f_magSize-_critsMissed)/f_magSize)))
 
         dpsPerMag.append(damageDealt/timeTaken)
     return dpsPerMag

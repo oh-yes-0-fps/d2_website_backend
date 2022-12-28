@@ -13,7 +13,15 @@ class viewModes(Enum):
     weaponStats = 3
     weaponPerks = 4
     weaponDPS = 5
+    weaaponTtk = 6
 
+def dpsMagResultToStr(_magValues: list[float]) -> str:
+    outStr = ""
+    counter = 1
+    for mag in _magValues:
+        outStr += f"mag {counter}: {round(mag)} dps\n"
+        counter += 1
+    return outStr
 
 def clearScreen():
     print("\033c", end="")
@@ -50,11 +58,35 @@ while True:
             clearScreen()
     if currentMode == viewModes.weaponStats:
         weapon = Weapon(api.entityDefJsonToWeaponData(selectedWeapon))
-        print(weapon)
-        ans = input("want some dps?")
+        rangeDct = weapon.getRange()
+        print(
+            weapon,
+            f"Falloff: {round(rangeDct['hipFalloffStart'],2)}m|{round(rangeDct['falloffStart'],2)}m",
+            f"\nReload Time: {round(weapon.reloadTime,2)}s"
+            )
+        ans = input("new/dps/ttk: ")
         if ans == "dps":
             currentMode = viewModes.weaponDPS
             clearScreen()
+        elif ans == "ttk":
+            currentMode = viewModes.weaaponTtk
+            clearScreen()
+        elif ans == "new":
+            currentMode = viewModes.search
+            clearScreen()
+    if currentMode == viewModes.weaaponTtk:
+        if weapon:
+            print(api.dictToString(weapon.getTtk(6)))
+            ans = input("new/dps/back: ")
+            if ans == "dps":
+                currentMode = viewModes.weaponDPS
+                clearScreen()
+            elif ans == "new":
+                currentMode = viewModes.search
+                clearScreen()
+            elif ans == "back":
+                currentMode = viewModes.weaponStats
+                clearScreen()
     if currentMode == viewModes.weaponDPS:
         rpl = input("what's the reccomended light level?")
         if not rpl.isnumeric():
@@ -80,8 +112,17 @@ while True:
         if weapon:
             dmg = weapon.getDamage(int(rpl), int(gpl), enemyType)
             print(f"damage: {dmg}")
-            print(weapon.getDps(dmg))
-            input("press enter to continue")
+            print(dpsMagResultToStr(weapon.getDps(dmg)))
+            ans = input("new/ttk/back: ")
+            if ans == "new":
+                currentMode = viewModes.search
+                clearScreen()
+            elif ans == "ttk":
+                currentMode = viewModes.weaaponTtk
+                clearScreen()
+            elif ans == "back":
+                currentMode = viewModes.weaponStats
+                clearScreen()
 
 
     clearScreen()

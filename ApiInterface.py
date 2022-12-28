@@ -15,6 +15,7 @@ class FiringConfig:
     burstSize: int
     oneAmmoBurst: bool = field(default=False)
     isCharge: bool = field(default=False)
+    isExplosive: bool = field(default=False)
 
 
 @dataclass()
@@ -78,7 +79,8 @@ class APIWeaponData:
                 burstDuration=archetypeData["burstDuration"],
                 burstSize=archetypeData["burstSize"],
                 oneAmmoBurst=archetypeData.get("oneAmmoBurst", False),
-                isCharge=False,  # TODO
+                isCharge=archetypeData.get("isCharge", False),
+                isExplosive=archetypeData.get("isExplosive", False),
             )
         )
 

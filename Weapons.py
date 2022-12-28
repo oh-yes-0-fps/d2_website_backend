@@ -9,23 +9,8 @@ from util.AmmoCalc import lerp
 from util.DpsCalc import calcDPS, calcRefund
 from util.TtkCalc import calcTtk
 from util.StatCalc import calcReload, calcHandling, calcRange
-from util.DamageCalc import calcDmgPve, BuffPackage, Activity
+from util.DamageCalc import calcDmgPve, BuffPackage, Activity, calcDmgPvp
 from ApiInterface import APIWeaponData, FiringConfig, FrameData
-
-
-RESILIENCE_VALUES = {
-    0: 115 + 70.01,  # 185.01
-    1: 116 + 70.01,  # 186.01
-    2: 117 + 70.01,  # 187.01
-    3: 118 + 70.01,  # 188.01
-    4: 119 + 70.01,  # 189.01
-    5: 120 + 70.01,  # 190.01
-    6: 122 + 70.01,  # 192.01
-    7: 124 + 70.01,  # 194.01
-    8: 126 + 70.01,  # 196.01
-    9: 128 + 70.01,  # 198.01
-    10: 130 + 70.01  # 200.01
-}
 
 
 def rpmToDelay(_rpm: int) -> float:
@@ -63,10 +48,10 @@ class Weapon:
         l_weaponStats = self.weaponData.stats
         self.weaponFrame = self.weaponData.getFrameData()
 
-        self.magSizeBounds = (0, 1)
+        self.magSizeBounds = []
         for i in self.weaponData.statLayout:
-            if i == StatHashes.MAGAZINE.value:
-                self.magSizeBounds = (i["displayInterpolation"][0]["weight"],i["displayInterpolation"][-1]["weight"])
+            if i["statHash"] == StatHashes.MAGAZINE.value:
+                self.magSizeBounds = i["displayInterpolation"]
 
 
         self.name = _weaponData.name
@@ -149,14 +134,18 @@ class Weapon:
         statLayout = self.weaponData.statLayout
         statStr = ""
         for entry in statLayout:
+            statStr += "\n"
             statHash = StatHashes.hashToEnum(entry["statHash"])
-            statObject = self.getStatAttrFromHash(statHash)  # type: ignore
-            statStr += f"{statHash.name}: "
+            if statHash != StatHashes.MAGAZINE:
+                statObject = self.getStatAttrFromHash(statHash)  # type: ignore
+            else:
+                statObject = Stat(self.magSize)
+            statStr += f"{statHash.name + ': ':16}"
             if entry["displayAsNumeric"] and statObject:
-                statStr += f"{statObject.baseValue + statObject.sumOfMods()}\n"
+                statStr += f"{statObject.baseValue + statObject.sumOfMods()}"
             elif statObject:
-                statStr += "\t" + self.makeAsciiStatBar(statObject) + "\n"
-        return f"{self.name}: {self.weaponType.name}\n"+statStr
+                statStr += self.makeAsciiStatBar(statObject)
+        return f"{self.name}: {self.weaponType.name}\n"+statStr+"\n"
 
     def configFiring(self, _firingSettings: FiringConfig) -> None:
         self.firingSettings = _firingSettings
@@ -197,12 +186,23 @@ class Weapon:
     def totalReserves(self) -> int:
         # TODO: try and figure out formula for reserves
         if self.ammoType == AmmoType.PRIMARY:
-            return 9999
+            return self.magSize*5
         return 20
 
     @property
     def magSize(self) -> int:
-        return int(lerp(self.magSizeBounds[0], self.magSizeBounds[1], self.magazineStat.val()/100)) + 1
+        keyId = 0
+        for i in range(len(self.magSizeBounds)):
+            if self.magazineStat.val() <= self.magSizeBounds[i]["value"]:
+                keyId = i-1
+                break
+        if keyId:
+            if self.magazineStat.val() == self.magSizeBounds[keyId]["value"]:
+                return self.magSizeBounds[keyId]["weight"]
+            t = (self.magazineStat.val() - self.magSizeBounds[keyId]["value"]/
+                    self.magSizeBounds[keyId+1]["value"]-self.magSizeBounds[keyId]["value"])
+            return ceil(lerp(self.magSizeBounds[keyId]["weight"], self.magSizeBounds[keyId+1]["weight"], t))
+        return 1
 
     @property
     def reloadTime(self) -> float:
@@ -212,19 +212,28 @@ class Weapon:
 
     def getDamage(self, _rpl:int, _gpl:int, _enemyType:EnemyType) -> float:
         #TODO
-        return calcDmgPve(Activity(_rpl), self.baseDamage, _gpl, _enemyType = _enemyType, _buffs = self.damageScalars)
+        inDmg = self.baseDamage * self.firingSettings.burstSize
+        return calcDmgPve(Activity(_rpl), inDmg, _gpl, _enemyType = _enemyType, _buffs = self.damageScalars)
 
-    def getDps(self, _damage: float, _shotsMissed: int = 0, _isChargeTime: bool = False) -> list[float]:
+    def getDps(self, _damage: float, _shotsMissed: int = 0) -> list[float]:
         """calculates the dps of the weapon"""
         if self.weaponType == WeaponType.SWORD:
             return []
         if self.weaponType == WeaponType.GRENADELAUNCHER:
             return []
-        return calcDPS(self.firingSettings.burstDelay, _damage, self.critMult, self.reloadTime, self.magazineStat.val(), self.totalReserves,
-                       _isChargeTime, _shotsMissed, self.refunds)
+        return calcDPS(self.firingSettings, _damage, self.critMult, self.reloadTime, self.magSize, self.totalReserves,
+                        _shotsMissed, self.refunds)
 
     def graphDPS(self, _damage: float):
         pass
 
-    def getTtk(self, _resilience: int, _damage: float, _critMult: float) -> dict[str, Union[int, float]]:
-        return calcTtk(self.firingSettings.burstDelay, _resilience, _damage, _critMult, self.magazineStat.val())
+    def getTtk(self, _resilience: int) -> dict[str, Union[int, float]]:
+        damage = calcDmgPvp(self.baseDamage, self.damageScalars)
+        if self.weaponType == WeaponType.SHOTGUN and self.critMult < 1.15:
+            critMult = 1.0
+        else:
+            critMult = self.critMult
+        return calcTtk(self.firingSettings, _resilience, damage, critMult, self.magazineStat.val())
+
+    def getRange(self) -> dict[str, float]:
+        return calcRange(self.weaponFrame.rangeData, self.rangeStat.val(), self.zoomStat.val(), self.hipFireRangeScalar)
